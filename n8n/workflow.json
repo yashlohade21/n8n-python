@@ -1,0 +1,72 @@
+{
+  "name": "CV Recruiter - Email Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "format": "resolved",
+        "mailbox": "INBOX",
+        "options": {
+          "forceReconnect": 300,
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "imap-trigger",
+      "name": "Email Trigger (IMAP)",
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "credentials": {
+        "imap": {
+          "id": "CONFIGURE_ME",
+          "name": "Gmail IMAP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/api/candidates/upload/",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "attachment_0"
+            },
+            {
+              "parameterType": "formData",
+              "name": "source_email",
+              "value": "={{ $json.from.text }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "upload-django",
+      "name": "Upload CV to Django",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 300]
+    }
+  ],
+  "connections": {
+    "Email Trigger (IMAP)": {
+      "main": [
+        [
+          {
+            "node": "Upload CV to Django",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+db.sqlite3
+.env
+media/cvs/*
+!media/cvs/.gitkeep
+staticfiles/
+*.log
+.venv/
+venv/
